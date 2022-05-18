@@ -8,4 +8,5 @@ func main() {
 
 func FeatureA() {
 	fmt.Println("feature a")
+	fmt.Println("hello world")
 }
