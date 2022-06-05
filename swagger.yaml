@@ -1,0 +1,438 @@
+openapi: 3.0.0
+
+info:
+  title: online-shop
+  description: Menjual online shop
+  version: 1.0.0-beta
+  
+tags:
+  - name: Admin
+  - name: Users
+  - name: Product
+  
+  
+servers:
+  - url: http://api.example.com/v1
+    description: Optional server description, e.g. Main (production) server
+    
+    
+paths:
+  '/api/users/login':
+    post:
+       summary: this is a login endpoint
+       tags:
+         - Users
+       requestBody:
+         content:
+           application/json:
+             schema:
+               type: object
+               properties:
+                 username:
+                   type: string
+                   example: gozzafadillah
+                 password:
+                   type: string
+                   example: cek123
+       responses:
+         '200':
+           description: success response
+           content: 
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                     message:
+                       type: string
+                       example: success login
+                     rescode:
+                       type: number
+                       example: 200
+                     data: 
+                       type: object
+                       properties:
+                         token:
+                           type: string
+                           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTd9.zfMgzW773oCQHKZ4N1ZH6q8NVTun7dMu86DzE6UH-Uc
+                       
+         '400':
+           description: bad response
+           content: 
+             application/json:
+               schema: 
+                 type: object
+                 properties:
+                   message:
+                     type: string
+                     example: bad request
+                   rescode:
+                     type: number
+                     example: 400
+                     
+  '/api/users/create':
+    post:
+      summary: this is a login endpoint
+      tags:
+         - Users
+      requestBody:
+       content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                 type: string
+                 example: Muhammad Fadillah Abdul Aziz
+              username:
+                 type: string
+                 example: gozzafadillah
+              password:
+                 type: string
+                 example: cek123
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: success insert data
+                  rescode:
+                    type: number
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                        example: gozzafadillah
+                      name:
+                        type: string
+                        example:  Muhammad Fadillah Abdul Aziz
+        '400':
+          description: bad response
+          content:
+            application/json:
+              schema:
+                type: object
+                
+  '/api/admin/login':
+    post:
+      summary: super admin login
+      tags:
+        - Admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: admin
+                password:
+                  type: string
+                  example: admin
+      responses:
+        '200':
+          description: super admin success login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: super admin success login
+                  rescode:
+                    type: number
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      token:
+                        type: string
+                        example: asdaiwjfaeifjdjwt
+  
+  '/api/products':
+     get:
+       summary: get all product endpoint
+       tags:
+         - Product
+       responses:
+         '200':
+           description: success get all product
+           content:
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                   message:
+                     type: string
+                     example: success get all product
+                   rescode: 
+                     type: number
+                     example: 200
+                   data:
+                       type: array
+                       items:
+                         oneOf:
+                           - type: object
+                             properties:
+                               code:
+                                 type: string
+                                 example: product-1-azx
+                               name:
+                                 type: string
+                                 example: Product 1
+                               description:
+                                type: string
+                                example: deskripsi product 1
+                               qty:
+                                 type: number
+                                 example: 20
+                               price: 
+                                 type: number
+                                 example: 175000
+                               weight:
+                                  type: number
+                                  example: 2.5
+                               status:
+                                   type: boolean
+                           - type: object
+                             properties:
+                               code:
+                                 type: string
+                                 example: product-2-axa
+                               name:
+                                 type: string
+                                 example: product 2
+                               description:
+                                type: string
+                                example: deskripsi product 2
+                               qty:
+                                 type: number
+                                 example: 50
+                               price: 
+                                 type: number
+                                 example: 20000
+                               weight:
+                                  type: number
+                                  example: 30
+                               status:
+                                   type: boolean
+         '400' :
+           description: bad response
+           content:
+             application/json:
+               schema:
+                 type: object
+                 properties:
+                   messange:
+                     type: string
+                     example: "bad request"
+                   rescode:
+                     type: number
+                     example: 400
+  
+  '/api/product/{id}':
+    get:
+      summary: get product by id endpoint
+      tags:
+        - Product
+      parameters:
+        - in: path
+          name: id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The product id 
+      responses:
+        '200':
+          description: success get product by id
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                      type: string
+                      example: product-1-azx
+                  name:
+                      type: string
+                      example: Product 1
+                  description:
+                      type: string
+                      example: deskripsi product 1
+                  qty:
+                      type: number
+                      example: 20
+                  price: 
+                      type: number
+                      example: 175000
+                  weight:
+                      type: number
+                      example: 2.5
+                  status:
+                      type: boolean
+        '400' :
+          description: bad response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messange:
+                    type: string
+                    example: "bad request"
+                  rescode:
+                    type: number
+                    example: 400      
+   
+  '/api/products/create':
+    post:
+      summary: create product by admin
+      tags:
+        - Product
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: product name
+                description:
+                  type: string
+                  example: product description
+                qty:
+                 type: number
+                 example: 30
+                price:
+                  type: number
+                  example: 15000
+                weight:
+                  type: number
+                  example: 10
+      responses:
+        '200': 
+          description: success create product
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                      type: string
+                      example: product-name
+                  name:
+                      type: string
+                      example: Product name
+                  description:
+                      type: string
+                      example: deskripsi product name
+                  qty:
+                      type: number
+                      example: 30
+                  price: 
+                      type: number
+                      example: 15000
+                  weight:
+                      type: number
+                      example: 10
+                  status:
+                      type: boolean
+                  
+                
+          
+  
+  '/api/products/update/{id}':
+    put:
+      description: update product by id
+      tags:
+        - Product
+      parameters:
+        - in: path
+          name: id   # Note the name is the same as in the path
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: The product id 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: product name
+                description:
+                  type: string
+                  example: product description
+                qty:
+                 type: number
+                 example: 30
+                price:
+                  type: number
+                  example: 15000
+                weight:
+                  type: number
+                  example: 10
+      responses:
+        '200':
+          description: success updated
+          content:
+            application/json:
+             schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  example: has been updated
+                rescode:
+                  type: number
+                  example: 200
+                data:
+                 type: object
+                 properties:
+                   name:
+                      type: string
+                      example: product name
+                   description:
+                      type: string
+                      example: product description
+                   qty:
+                     type: number
+                     example: 30
+                   price:
+                    type: number
+                    example: 15000
+                   weight:
+                    type: number
+                    example: 10
+
+      
+  
+  '/api/products/delete/{id}':
+  
+  '/api/products/filter?category={name}':
+  
+  '/api/products/filter?price=min':
+  
+  '/api/products/filter?price=max':
+  
+  '/api/checkout/{product_code}':
+  
+  '/api/transactions/{code}':
+            
+                           
+                        
+                   
+                
