@@ -8,7 +8,8 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"net/http"
-	"strconv"
+
+	"github.com/xlzd/gotp"
 )
 
 type respon struct {
@@ -27,8 +28,8 @@ func rangeIn(low, hi int) int {
 }
 
 func main() {
-	code := strconv.Itoa(rangeIn(99999, 1000000))
-	fmt.Println(code)
+	secretLength := 4
+	code := gotp.RandomSecret(secretLength)
 
 	var jsonData = []byte(`{
 		"Messages":[
