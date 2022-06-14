@@ -1,28 +1,69 @@
 package main
 
 import (
+	"bytes"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
-
-	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
+	"math/rand"
+	"net/http"
+	"strconv"
 )
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
-	return string(bytes), err
+type respon struct {
+	Messages []struct {
+		Status string `json:"Status"`
+		To     []struct {
+			Email       string `json:"Email"`
+			MessageID   string `json:"MessageID"`
+			MessageHref string `json:"MessageHref"`
+		} `json:"To"`
+	} `json:"Messages"`
 }
 
-func CheckPasswordHash(password, hash string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
-	return err == nil
+func rangeIn(low, hi int) int {
+	return low + rand.Intn(hi-low)
 }
 
 func main() {
-	password := "!Ciba1234"
-	hash, _ := HashPassword(password) // ignore error for the sake of simplicity
+	code := strconv.Itoa(rangeIn(99999, 1000000))
+	fmt.Println(code)
 
-	fmt.Println("Password:", password)
-	fmt.Println("Hash:    ", hash)
+	var jsonData = []byte(`{
+		"Messages":[
+				{
+						"From": {
+								"Email": "gozza15bdg@gmail.com",
+								"Name": "Fadillah"
+						},
+						"To": [
+								{
+										"Email": "` + "gozzafadillah@gmail.com" + `",
+										"Name": "` + "aziz" + `"
+								}
+						],
+						"Subject": "Cek Ombak",
+						"TextPart": "Code Generator",
+						"HTMLPart": "<center><h2>OTP Code</h2><br /> <b><u>` + code + `</u></b> </center>"
+				}
+		]
+	}`)
 
-	match := CheckPasswordHash(password, hash)
-	fmt.Println("Match:   ", match)
+	url := "https://api.mailjet.com/v3.1/send"
+
+	req, _ := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+
+	basic := base64.StdEncoding.EncodeToString([]byte("177a3a51988d43f5512cf71bff810623" + ":" + "ba69cb7437c1bad179c8af199ba33dd1"))
+
+	req.Header.Add("Authorization", "Basic "+basic)
+
+	res, _ := http.DefaultClient.Do(req)
+
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	var result = respon{}
+	json.Unmarshal(body, &result)
+
+	fmt.Println(result)
 }
