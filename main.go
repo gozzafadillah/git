@@ -1,12 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"gozzafadillah/handler"
 
-	"github.com/gosimple/slug"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	text := slug.Make("E-wallet Dana")
-	fmt.Println(text)
+	e := echo.New()
+
+	e.POST("/file", handler.FileUpload)
+	e.POST("/remote", handler.RemoteUpload)
+
+	e.Logger.Fatal(e.Start(":8080"))
 }
