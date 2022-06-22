@@ -2,9 +2,11 @@ module gozzafadillah
 
 go 1.17
 
-require github.com/xlzd/gotp v0.0.0-20220110052318-fab697c03c2c
+require github.com/xendit/xendit-go v1.0.8
 
 require (
-	github.com/gosimple/slug v1.12.0 // indirect
-	github.com/gosimple/unidecode v1.0.1 // indirect
+	github.com/go-playground/locales v0.13.0 // indirect
+	github.com/go-playground/universal-translator v0.17.0 // indirect
+	github.com/go-playground/validator/v10 v10.2.0 // indirect
+	github.com/leodido/go-urn v1.2.0 // indirect
 )
