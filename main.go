@@ -2,75 +2,26 @@ package main
 
 import (
 	"fmt"
-	"log"
-
-	"github.com/google/uuid"
-	"github.com/labstack/echo"
-	"github.com/xendit/xendit-go"
-	"github.com/xendit/xendit-go/invoice"
+	"regexp"
 )
 
 func main() {
-	e := echo.New()
-	e.GET("/data", xendit_invoice)
-	e.Start(":8080")
 
+	var text = "0895631948686"
+	// var text = "081320503262"
+	var regex, _ = regexp.Compile(`[a-z]+`)
+
+	regex.FindStringIndex(text)
+
+	lenght := len(text)
+	var str = text[1:lenght]
+	fmt.Println("+62" + str)
+	status := check(str)
+	fmt.Println("status :", status)
 }
 
-func xendit_invoice(ctx echo.Context) error {
-
-	xendit.Opt.SecretKey = "xnd_development_I0guK5bOcQB3AVQ8pYUXMtXltsVvfqsyPU2dz1RJvTDNVrsLVxqC8K0KJc3YhlZE"
-	code := uuid.New()
-
-	customer := xendit.Customer{
-		GivenNames:   "John",
-		Surname:      "Doe",
-		Email:        "gozzafadillah@gmail.com",
-		MobileNumber: "+62895631948686",
-	}
-	invoiceCustomer := xendit.InvoiceCustomer{
-		GivenNames:   customer.GivenNames,
-		Email:        customer.Email,
-		MobileNumber: customer.MobileNumber,
-	}
-	item := xendit.InvoiceItem{
-		Name:     "Paket XL 20RB",
-		Price:    20000,
-		Quantity: 1,
-		Category: "Top Up",
-	}
-	fee := xendit.InvoiceFee{
-		Type:  "ADMIN",
-		Value: 2000,
-	}
-
-	NotificationType := []string{"whatsapp", "email", "sms"}
-	customerNotificationPreference := xendit.InvoiceCustomerNotificationPreference{
-		InvoiceCreated:  NotificationType,
-		InvoiceReminder: NotificationType,
-		InvoicePaid:     NotificationType,
-		InvoiceExpired:  NotificationType,
-	}
-
-	data := invoice.CreateParams{
-		ExternalID:                     "demo_" + code.String(),
-		Amount:                         item.Price + fee.Value,
-		PayerEmail:                     customer.Email,
-		Description:                    "Paket Data XL",
-		Items:                          []xendit.InvoiceItem{item},
-		Customer:                       invoiceCustomer,
-		Fees:                           []xendit.InvoiceFee{fee},
-		CustomerNotificationPreference: customerNotificationPreference,
-	}
-
-	resp, err := invoice.Create(&data)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("created invoice: %+v\n", resp)
-	return ctx.JSON(200, map[string]interface{}{
-		"message": "success",
-		"payment": resp,
-	})
+func check(phone string) bool {
+	regex, _ := regexp.Compile(`^(0|62|\+62)(8[1-35-9]\d{7,10}|2[124]\d{7,8}|619\d{8}|2(?:1(?:14|500)|2\d{3})\d{3}|61\d{5,8}|(?:2(?:[35][1-4]|6[0-8]|7[1-6]|8\d|9[1-8])|3(?:1|[25][1-8]|3[1-68]|4[1-3]|6[1-3568]|7[0-469]|8\d)|4(?:0[1-589]|1[01347-9]|2[0-36-8]|3[0-24-68]|43|5[1-378]|6[1-5]|7[134]|8[1245])|5(?:1[1-35-9]|2[25-8]|3[124-9]|4[1-3589]|5[1-46]|6[1-8])|6(?:[25]\d|3[1-69]|4[1-6])|7(?:02|[125][1-9]|[36]\d|4[1-8]|7[0-36-9])|9(?:0[12]|1[013-8]|2[0-479]|5[125-8]|6[23679]|7[159]|8[01346]))\d{5,8})`)
+	var isMatch = regex.MatchString(phone)
+	return isMatch
 }
