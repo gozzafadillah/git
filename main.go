@@ -7,15 +7,15 @@ import (
 
 func main() {
 
-	var text = "0895631948686"
+	var text = "+62895631948686"
 	// var text = "081320503262"
 	var regex, _ = regexp.Compile(`[a-z]+`)
 
 	regex.FindStringIndex(text)
 
 	lenght := len(text)
-	var str = text[1:lenght]
-	fmt.Println("+62" + str)
+	var str = text[3:lenght]
+	fmt.Println("0" + str)
 	status := check(str)
 	fmt.Println("status :", status)
 }
