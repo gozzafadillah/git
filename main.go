@@ -1,27 +1,100 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"regexp"
+	"io/ioutil"
+	"net/http"
+	"time"
 )
 
-func main() {
-
-	var text = "+62895631948686"
-	// var text = "081320503262"
-	var regex, _ = regexp.Compile(`[a-z]+`)
-
-	regex.FindStringIndex(text)
-
-	lenght := len(text)
-	var str = text[3:lenght]
-	fmt.Println("0" + str)
-	status := check(str)
-	fmt.Println("status :", status)
+type Data struct {
+	ID                        string    `json:"id"`
+	ExternalID                string    `json:"external_id"`
+	UserID                    string    `json:"user_id"`
+	Status                    string    `json:"status"`
+	MerchantName              string    `json:"merchant_name"`
+	MerchantProfilePictureURL string    `json:"merchant_profile_picture_url"`
+	Amount                    int       `json:"amount"`
+	PayerEmail                string    `json:"payer_email"`
+	Description               string    `json:"description"`
+	ExpiryDate                time.Time `json:"expiry_date"`
+	InvoiceURL                string    `json:"invoice_url"`
+	AvailableBanks            []struct {
+		BankCode          string `json:"bank_code"`
+		CollectionType    string `json:"collection_type"`
+		TransferAmount    int    `json:"transfer_amount"`
+		BankBranch        string `json:"bank_branch"`
+		AccountHolderName string `json:"account_holder_name"`
+		IdentityAmount    int    `json:"identity_amount"`
+	} `json:"available_banks"`
+	AvailableRetailOutlets []struct {
+		RetailOutletName string `json:"retail_outlet_name"`
+	} `json:"available_retail_outlets"`
+	AvailableEwallets []struct {
+		EwalletType string `json:"ewallet_type"`
+	} `json:"available_ewallets"`
+	AvailableDirectDebits []struct {
+		DirectDebitType string `json:"direct_debit_type"`
+	} `json:"available_direct_debits"`
+	AvailablePaylaters      []interface{} `json:"available_paylaters"`
+	ShouldExcludeCreditCard bool          `json:"should_exclude_credit_card"`
+	ShouldSendEmail         bool          `json:"should_send_email"`
+	Created                 time.Time     `json:"created"`
+	Updated                 time.Time     `json:"updated"`
+	Currency                string        `json:"currency"`
+	Items                   []struct {
+		Name     string `json:"name"`
+		Price    int    `json:"price"`
+		Quantity int    `json:"quantity"`
+		Category string `json:"category"`
+	} `json:"items"`
+	Fees []struct {
+		Type  string `json:"type"`
+		Value int    `json:"value"`
+	} `json:"fees"`
+	Customer struct {
+		GivenNames   string `json:"given_names"`
+		Email        string `json:"email"`
+		MobileNumber string `json:"mobile_number"`
+	} `json:"customer"`
+	CustomerNotificationPreference struct {
+		InvoiceCreated  []string `json:"invoice_created"`
+		InvoiceReminder []string `json:"invoice_reminder"`
+		InvoicePaid     []string `json:"invoice_paid"`
+		InvoiceExpired  []string `json:"invoice_expired"`
+	} `json:"customer_notification_preference"`
 }
 
-func check(phone string) bool {
-	regex, _ := regexp.Compile(`^(0|62|\+62)(8[1-35-9]\d{7,10}|2[124]\d{7,8}|619\d{8}|2(?:1(?:14|500)|2\d{3})\d{3}|61\d{5,8}|(?:2(?:[35][1-4]|6[0-8]|7[1-6]|8\d|9[1-8])|3(?:1|[25][1-8]|3[1-68]|4[1-3]|6[1-3568]|7[0-469]|8\d)|4(?:0[1-589]|1[01347-9]|2[0-36-8]|3[0-24-68]|43|5[1-378]|6[1-5]|7[134]|8[1245])|5(?:1[1-35-9]|2[25-8]|3[124-9]|4[1-3589]|5[1-46]|6[1-8])|6(?:[25]\d|3[1-69]|4[1-6])|7(?:02|[125][1-9]|[36]\d|4[1-8]|7[0-36-9])|9(?:0[12]|1[013-8]|2[0-479]|5[125-8]|6[23679]|7[159]|8[01346]))\d{5,8})`)
-	var isMatch = regex.MatchString(phone)
-	return isMatch
+func DetailTransactionXendit(paymentID string) interface{} {
+
+	url := "https://api.xendit.co/v2/invoices/" + paymentID
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	req.Header.Add("Authorization", "Basic eG5kX2RldmVsb3BtZW50X0kwZ3VLNWJPY1FCM0FWUThwWVVYTXRYbHRzVnZmcXN5UFUyZHoxUkp2VEROVnJzTFZ4cUM4SzBLSmMzWWhsWkU6")
+	req.Header.Add("Cookie", "incap_ses_7264_2182539=TDK6VWyh7gJagAQpnenOZJlH1mIAAAAACRNwEzYd9ElMYWlIWUUQ7Q==; nlbi_2182539=66GMWKBkMiAwMfOrjjCKbQAAAACDB8IL0atKp47HSWHkW8Ka")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	result := Data{}
+	json.Unmarshal(body, &result)
+	return result
+}
+
+func main() {
+	fmt.Println("data ", DetailTransactionXendit("62d400cac91583850380f930"))
 }
